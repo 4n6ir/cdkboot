@@ -33,7 +33,8 @@ class CdkbootStack(Stack):
                     'python -m pip install -r requirements.txt', 
                     'cdk synth'
                 ]
-            )
+            ),
+            docker_enabled_for_synth = True
         )
 
         pipeline.add_stage(
@@ -42,6 +43,9 @@ class CdkbootStack(Stack):
                 env = cdk.Environment(
                     account = account,
                     region = region
+                ),
+                synthesizer = cdk.DefaultStackSynthesizer(
+                    qualifier = '4n6ir'
                 )
             )
         )
