@@ -1,11 +1,6 @@
-from aws_cdk import (
-    Duration,
-    RemovalPolicy,
-    Stack,
-    aws_iam as _iam,
-    aws_lambda as _lambda,
-    aws_logs as _logs
-)
+import aws_cdk as cdk
+
+from aws_cdk import Stack
 
 from aws_cdk.pipelines import (
     CodePipeline,
@@ -15,10 +10,15 @@ from aws_cdk.pipelines import (
 
 from constructs import Construct
 
+from cdkboot.cdkboot_stage import CdkbootStage
+
 class CdkbootStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        account = Stack.of(self).account
+        region = Stack.of(self).region
 
         pipeline = CodePipeline(
             self, 'pipeline', 
@@ -33,34 +33,15 @@ class CdkbootStack(Stack):
                     'python -m pip install -r requirements.txt', 
                     'cdk synth'
                 ]
-            ),
-            docker_enabled_for_synth = True
-        )
-
-        role = _iam.Role(
-            self, 'role', 
-            assumed_by = _iam.ServicePrincipal(
-                'lambda.amazonaws.com'
             )
         )
 
-        role.add_managed_policy(
-            _iam.ManagedPolicy.from_aws_managed_policy_name(
-                'service-role/AWSLambdaBasicExecutionRole'
+        pipeline.add_stage(
+            CdkbootStage(
+                self, 'stage',
+                env = cdk.Environment(
+                    account = account,
+                    region = region
+                )
             )
-        )
-
-        install = _lambda.DockerImageFunction(
-            self, 'install',
-            code = _lambda.DockerImageCode.from_image_asset('install'),
-            timeout = Duration.seconds(900),
-            memory_size = 512,
-            role = role
-        )
-
-        installlogs = _logs.LogGroup(
-            self, 'installlogs',
-            log_group_name = '/aws/lambda/'+install.function_name,
-            retention = _logs.RetentionDays.ONE_DAY,
-            removal_policy = RemovalPolicy.DESTROY
         )
