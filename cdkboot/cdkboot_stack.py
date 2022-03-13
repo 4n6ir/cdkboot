@@ -33,7 +33,8 @@ class CdkbootStack(Stack):
                     'python -m pip install -r requirements.txt', 
                     'cdk synth'
                 ]
-            )
+            ),
+            docker_enabled_for_self_mutation = True
         )
 
         role = _iam.Role(
