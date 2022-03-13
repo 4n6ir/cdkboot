@@ -34,7 +34,7 @@ class CdkbootStack(Stack):
                     'cdk synth'
                 ]
             ),
-            docker_enabled_for_self_mutation = True
+            docker_enabled_for_synth = True
         )
 
         role = _iam.Role(
