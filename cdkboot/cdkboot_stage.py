@@ -10,5 +10,8 @@ class CdkbootStage(cdk.Stage):
         super().__init__(scope, construct_id, **kwargs)
 
         lambdaStack = CdkbootLambda(
-            self, 'lambdaStack'
+            self, 'lambdaStack',
+            synthesizer = cdk.DefaultStackSynthesizer(
+                qualifier = '4n6ir'
+            )
         )

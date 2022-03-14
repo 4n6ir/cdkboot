@@ -43,9 +43,6 @@ class CdkbootStack(Stack):
                 env = cdk.Environment(
                     account = account,
                     region = region
-                ),
-                synthesizer = cdk.DefaultStackSynthesizer(
-                    qualifier = '4n6ir'
                 )
             )
         )
