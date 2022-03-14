@@ -39,7 +39,7 @@ class CdkbootStack(Stack):
 
         pipeline.add_stage(
             CdkbootStage(
-                self, 'stage',
+                self, 'cdkboot',
                 env = cdk.Environment(
                     account = account,
                     region = region
