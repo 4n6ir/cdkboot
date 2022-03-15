@@ -5,5 +5,6 @@ RUN yum -y update && \
     yum install -y nodejs && \
     npm install -g aws-cdk && \
     date +%s
+RUN pip install pyyaml
 COPY install.py ./
 CMD ["install.handler"]

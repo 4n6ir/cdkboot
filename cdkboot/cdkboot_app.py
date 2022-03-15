@@ -1,4 +1,5 @@
 from aws_cdk import (
+    CustomResource,
     Duration,
     RemovalPolicy,
     Stack,
@@ -6,7 +7,8 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_logs as _logs,
     aws_s3 as _s3,
-    aws_ssm as _ssm
+    aws_ssm as _ssm,
+    custom_resources as _custom
 )
 
 from constructs import Construct
@@ -26,7 +28,7 @@ class CdkbootApp(Stack):
 
         account = Stack.of(self).account
         region = Stack.of(self).region
-        bootstrap_name = 'cdkboot-bootstrap-'+account+'-'+region
+        bucket_name = 'cdkboot-bootstrap-'+account+'-'+region
 
 ### Organization ID Parameter ###
 
@@ -37,10 +39,11 @@ class CdkbootApp(Stack):
 
 ### Bootstrap Bucket ###
 
-        bootstrap = _s3.Bucket(
-            self, 'bootstrap',
-            bucket_name = bootstrap_name,
+        bucket = _s3.Bucket(
+            self, 'bucket',
+            bucket_name = bucket_name,
             versioned = True,
+            auto_delete_objects = True,
             encryption = _s3.BucketEncryption.S3_MANAGED,
             block_public_access = _s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy = RemovalPolicy.DESTROY
@@ -57,11 +60,11 @@ class CdkbootApp(Stack):
                 's3:GetObject'  
             ],
             resources = [
-                bootstrap.bucket_arn+'/*'
+                bucket.bucket_arn+'/*'
             ],
             conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
         )
-        bootstrap.add_to_resource_policy(bucket_policy)
+        bucket.add_to_resource_policy(bucket_policy)
 
 ### IAM Role
 
@@ -94,13 +97,22 @@ class CdkbootApp(Stack):
             )
         )
 
-### GitHub RSS Feed ###
+### Install Bootstrap ###
+
+        bootstrap = _ssm.StringParameter(
+            self, 'bootstrap',
+            description = 'CDKBoot Bootstrap Version',
+            parameter_name = '/cdkboot/bootstrap',
+            string_value = 'Empty',
+            tier = _ssm.ParameterTier.STANDARD
+        )
 
         install = _lambda.DockerImageFunction(
             self, 'install',
             code = _lambda.DockerImageCode.from_image_asset('install'),
             environment = dict(
-                BOOTSTRAP = bootstrap.bucket_name
+                BUCKET = bucket.bucket_name,
+                BOOTSTRAP = bootstrap.parameter_name
             ),
             timeout = Duration.seconds(900),
             memory_size = 512,
@@ -120,4 +132,14 @@ class CdkbootApp(Stack):
             parameter_name = '/cdkboot/monitor/install',
             string_value = '/aws/lambda/'+install.function_name,
             tier = _ssm.ParameterTier.STANDARD,
+        )
+
+        provider = _custom.Provider(
+            self, 'provider',
+            on_event_handler = install
+        )
+
+        resource = CustomResource(
+            self, 'resource',
+            service_token = provider.service_token
         )
