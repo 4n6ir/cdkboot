@@ -18,7 +18,7 @@ def handler(event, context):
     )
     bootstrap = response['Parameter']['Value']
 
-    if version != str(parsed_yaml['Resources']['CdkBootstrapVersion']['Properties']['Value']):
+    if bootstrap != str(parsed_yaml['Resources']['CdkBootstrapVersion']['Properties']['Value']):
 
         s3_client = boto3.client('s3')
 
