@@ -37,12 +37,12 @@ class CdkbootStack(Stack):
             docker_enabled_for_synth = True
         )
 
-        pipeline.add_stage(
-            CdkbootStage(
-                self, 'cdkboot',
-                env = cdk.Environment(
-                    account = account,
-                    region = region
-                )
-            )
-        )
+        #pipeline.add_stage(
+        #    CdkbootStage(
+        #        self, 'cdkboot',
+        #        env = cdk.Environment(
+        #            account = account,
+        #            region = region
+        #        )
+        #    )
+        #)
