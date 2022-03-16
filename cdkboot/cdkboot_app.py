@@ -1,5 +1,4 @@
 from aws_cdk import (
-    CustomResource,
     Duration,
     RemovalPolicy,
     Stack,
@@ -9,8 +8,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_logs as _logs,
     aws_s3 as _s3,
-    aws_ssm as _ssm,
-    custom_resources as _custom
+    aws_ssm as _ssm
 )
 
 from constructs import Construct
@@ -83,6 +81,12 @@ class CdkbootApp(Stack):
             )
         )
 
+        role.add_managed_policy(
+            _iam.ManagedPolicy.from_aws_managed_policy_name(
+                'service-role/AWSLambdaRole'
+            )
+        )
+
         role.add_to_policy(
             _iam.PolicyStatement(
                 actions = [
@@ -91,7 +95,6 @@ class CdkbootApp(Stack):
                     'organizations:ListAccounts',
                     's3:GetObject',
                     's3:PutObject',
-                    'secretsmanager:GetSecretValue',
                     'ssm:GetParameter',
                     'ssm:PutParameter',
                     'sts:AssumeRole'
@@ -137,16 +140,6 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD,
         )
 
-        provider = _custom.Provider(
-            self, 'provider',
-            on_event_handler = install
-        )
-
-        resource = CustomResource(
-            self, 'resource',
-            service_token = provider.service_token
-        )
-
 ### GitHub RSS Feed ###
 
         versions = _ssm.StringParameter(
@@ -161,6 +154,7 @@ class CdkbootApp(Stack):
             self, 'version',
             code = _lambda.DockerImageCode.from_image_asset('version'),
             environment = dict(
+                NEXT_LAMBDA = install.function_name,
                 VERSIONS = versions.parameter_name
             ),
             timeout = Duration.seconds(900),
