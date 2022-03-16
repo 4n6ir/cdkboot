@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_logs as _logs,
     aws_s3 as _s3,
+    aws_s3_notifications as _notifications,
     aws_ssm as _ssm
 )
 
@@ -201,4 +202,38 @@ class CdkbootApp(Stack):
 
 ### Deploy Cloud Formation ###
 
+        deploy = _lambda.Function(
+            self, 'deploy',
+            runtime = _lambda.Runtime.PYTHON_3_9,
+            code = _lambda.Code.from_asset('deploy'),
+            handler = 'deploy.handler',
+            architecture = _lambda.Architecture.ARM_64,
+            environment = dict(
+                ACCOUNT = account,
+                BUCKET = bucket.bucket_name,
+                QUALIFIER = qualifier,
+                REGION = region,
+                REGIONS = regions
+            ),
+            timeout = Duration.seconds(900),
+            memory_size = 512,
+            role = role
+        )
 
+        deploylogs = _logs.LogGroup(
+            self, 'deploylogs',
+            log_group_name = '/aws/lambda/'+deploy.function_name,
+            retention = _logs.RetentionDays.ONE_DAY,
+            removal_policy = RemovalPolicy.DESTROY
+        )
+
+        deploymonitor = _ssm.StringParameter(
+            self, 'deploymonitor',
+            description = 'CDKBoot Deploy Monitor',
+            parameter_name = '/cdkboot/monitor/deploy',
+            string_value = '/aws/lambda/'+deploy.function_name,
+            tier = _ssm.ParameterTier.STANDARD,
+        )
+
+        notify = _notifications.LambdaDestination(deploy)
+        bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
