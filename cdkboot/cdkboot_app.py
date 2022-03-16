@@ -81,12 +81,6 @@ class CdkbootApp(Stack):
             )
         )
 
-        role.add_managed_policy(
-            _iam.ManagedPolicy.from_aws_managed_policy_name(
-                'service-role/AWSLambdaRole'
-            )
-        )
-
         role.add_to_policy(
             _iam.PolicyStatement(
                 actions = [
@@ -95,6 +89,7 @@ class CdkbootApp(Stack):
                     'organizations:ListAccounts',
                     's3:GetObject',
                     's3:PutObject',
+                    'secretsmanager:GetSecretValue',
                     'ssm:GetParameter',
                     'ssm:PutParameter',
                     'sts:AssumeRole'
@@ -140,6 +135,20 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD,
         )
 
+        events = _events.Rule(
+            self, 'events',
+            schedule = _events.Schedule.cron(
+                minute = '0',
+                hour = '*',
+                month = '*',
+                week_day = '*',
+                year = '*'
+            )
+        )
+        events.add_target(
+            _targets.LambdaFunction(install)
+        )
+
 ### GitHub RSS Feed ###
 
         versions = _ssm.StringParameter(
@@ -154,7 +163,6 @@ class CdkbootApp(Stack):
             self, 'version',
             code = _lambda.DockerImageCode.from_image_asset('version'),
             environment = dict(
-                NEXT_LAMBDA = install.function_name,
                 VERSIONS = versions.parameter_name
             ),
             timeout = Duration.seconds(900),
@@ -179,14 +187,18 @@ class CdkbootApp(Stack):
 
         event = _events.Rule(
             self, 'event',
-            schedule=_events.Schedule.cron(
-                minute='0',
-                hour='*',
-                month='*',
-                week_day='*',
-                year='*'
+            schedule = _events.Schedule.cron(
+                minute = '0',
+                hour = '*',
+                month = '*',
+                week_day = '*',
+                year = '*'
             )
         )
-        event.add_target(_targets.LambdaFunction(version))
+        event.add_target(
+            _targets.LambdaFunction(version)
+        )
 
-###
+### Deploy Cloud Formation ###
+
+

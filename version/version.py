@@ -23,13 +23,24 @@ def handler(event, context):
 
         if poll_response.entries[0].title[0:2] == 'v2':
 
-            lambda_client = boto3.client('lambda')
+            f = open('/tmp/'+poll_response.entries[0].title, 'w') 
+            f.write(poll_response.entries[0].link)
+            f.close()
 
-            lambda_client.invoke(
-                FunctionName = os.environ['NEXT_LAMBDA'],
-                InvocationType = 'Event',
-                Payload = json.dumps('CDKBoot Install')
+            with open('/tmp/'+poll_response.entries[0].title, 'rb') as binary_file:
+                binary_data = binary_file.read()
+
+            secret_client = boto3.client('secretsmanager')
+
+            response = secret_client.get_secret_value(
+                SecretId = 'github-token'
             )
+
+            g = Github(response['SecretString'])
+
+            repo = g.get_repo('jblukach/cdkboot')
+
+            repo.create_file('status/'+poll_response.entries[0].title, poll_response.entries[0].title, binary_data, branch='main')
 
             response = ssm_client.put_parameter(
                 Name = os.environ['VERSIONS'],
