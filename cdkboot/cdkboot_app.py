@@ -3,6 +3,8 @@ from aws_cdk import (
     Duration,
     RemovalPolicy,
     Stack,
+    aws_events as _events,
+    aws_events_targets as _targets,
     aws_iam as _iam,
     aws_lambda as _lambda,
     aws_logs as _logs,
@@ -66,7 +68,7 @@ class CdkbootApp(Stack):
         )
         bucket.add_to_resource_policy(bucket_policy)
 
-### IAM Role
+### IAM Role ###
 
         role = _iam.Role(
             self, 'role', 
@@ -89,6 +91,7 @@ class CdkbootApp(Stack):
                     'organizations:ListAccounts',
                     's3:GetObject',
                     's3:PutObject',
+                    'secretsmanager:GetSecretValue',
                     'ssm:GetParameter',
                     'ssm:PutParameter',
                     'sts:AssumeRole'
@@ -143,3 +146,53 @@ class CdkbootApp(Stack):
             self, 'resource',
             service_token = provider.service_token
         )
+
+### GitHub RSS Feed ###
+
+        versions = _ssm.StringParameter(
+            self, 'versions',
+            description = 'CDKBoot Version',
+            parameter_name = '/cdkboot/version',
+            string_value = 'Empty',
+            tier = _ssm.ParameterTier.STANDARD
+        )
+
+        version = _lambda.DockerImageFunction(
+            self, 'version',
+            code = _lambda.DockerImageCode.from_image_asset('version'),
+            environment = dict(
+                VERSIONS = versions.parameter_name
+            ),
+            timeout = Duration.seconds(900),
+            memory_size = 512,
+            role = role
+        )
+
+        versionlogs = _logs.LogGroup(
+            self, 'versionlogs',
+            log_group_name = '/aws/lambda/'+version.function_name,
+            retention = _logs.RetentionDays.ONE_DAY,
+            removal_policy = RemovalPolicy.DESTROY
+        )
+
+        versionmonitor = _ssm.StringParameter(
+            self, 'versionmonitor',
+            description = 'CDKBoot Version Monitor',
+            parameter_name = '/cdkboot/monitor/version',
+            string_value = '/aws/lambda/'+version.function_name,
+            tier = _ssm.ParameterTier.STANDARD,
+        )
+
+        event = _events.Rule(
+            self, 'event',
+            schedule=_events.Schedule.cron(
+                minute='0',
+                hour='*',
+                month='*',
+                week_day='*',
+                year='*'
+            )
+        )
+        event.add_target(_targets.LambdaFunction(version))
+
+###
