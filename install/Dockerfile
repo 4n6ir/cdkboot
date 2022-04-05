@@ -5,6 +5,6 @@ RUN yum -y update && \
     yum install -y nodejs && \
     npm install -g aws-cdk && \
     date +%s
-RUN pip install pyyaml
-COPY install.py ./
+COPY install.py requirements.txt ./
+RUN pip --no-cache-dir install -r requirements.txt --upgrade
 CMD ["install.handler"]
