@@ -2,8 +2,12 @@ import boto3
 import json
 import os
 import yaml
+from subprocess import run
 
 def handler(event, context):
+    
+    p = run( [ 'cdk', 'version' ], capture_output = True )
+    print("AWS Cloud Development Kit (CDK)", p.stdout.decode())
     
     os.system('export CDK_NEW_BOOTSTRAP=1 && cdk bootstrap --show-template > /tmp/cdk.yaml')
     
@@ -17,6 +21,9 @@ def handler(event, context):
         Name = os.environ['BOOTSTRAP']
     )
     bootstrap = response['Parameter']['Value']
+    
+    print('Current Bootstrap: '+bootstrap)
+    print('Future Bootstrap:  '+str(parsed_yaml['Resources']['CdkBootstrapVersion']['Properties']['Value']))
 
     if bootstrap != str(parsed_yaml['Resources']['CdkBootstrapVersion']['Properties']['Value']):
 
