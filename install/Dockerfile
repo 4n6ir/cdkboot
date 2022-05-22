@@ -3,7 +3,7 @@ RUN yum -y update && \
     curl -sL https://rpm.nodesource.com/setup_16.x | bash - && \
     yum list available nodejs && \
     yum install -y nodejs && \
-    npm install -g aws-cdk && \
+    npm install -g aws-cdk@latest && \
     date +%s
 COPY install.py requirements.txt ./
 RUN pip --no-cache-dir install -r requirements.txt --upgrade
