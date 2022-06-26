@@ -4,7 +4,7 @@ RUN yum -y update && \
     yum list available nodejs && \
     yum install -y nodejs && \
     npm install -g aws-cdk@latest && \
-    date +%s
+    yum clean all
 COPY install.py requirements.txt ./
 RUN pip --no-cache-dir install -r requirements.txt --upgrade
 CMD ["install.handler"]

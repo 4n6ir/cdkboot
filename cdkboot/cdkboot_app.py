@@ -111,7 +111,12 @@ class CdkbootApp(Stack):
 
         install = _lambda.DockerImageFunction(
             self, 'install',
-            code = _lambda.DockerImageCode.from_image_asset('install'),
+            code = _lambda.DockerImageCode.from_image_asset(
+                'install',
+                build_args = [
+                    '--no-cache'    
+                ]
+            ),
             environment = dict(
                 BUCKET = bucket.bucket_name,
                 BOOTSTRAP = bootstrap.parameter_name
