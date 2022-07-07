@@ -32,9 +32,9 @@ def handler(event, context):
             f.write('RUN yum install -y nodejs\n')
             f.write('RUN npm install -g aws-cdk@latest\n')
             f.write('RUN yum clean all\n')
-            f.write('COPY nanopipeline.py requirements.txt ./\n')
+            f.write('COPY install.py requirements.txt ./\n')
             f.write('RUN pip --no-cache-dir install -r requirements.txt --upgrade\n')
-            f.write('CMD ["nanopipeline.handler"]\n')
+            f.write('CMD ["install.handler"]\n')
             f.close()
 
             with open('/tmp/Dockerfile', 'r') as f:
