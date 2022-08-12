@@ -113,9 +113,9 @@ class CdkbootApp(Stack):
             self, 'install',
             code = _lambda.DockerImageCode.from_image_asset(
                 'install',
-                build_args = [
-                    '--no-cache'    
-                ]
+                build_args = {
+                    'NOCACHE': '--no-cache'
+                }
             ),
             environment = dict(
                 BUCKET = bucket.bucket_name,
