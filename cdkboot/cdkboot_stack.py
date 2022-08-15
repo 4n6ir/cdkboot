@@ -1,12 +1,8 @@
 import aws_cdk as cdk
 
-from aws_cdk import (
-    Stack,
-    aws_iam as _iam
-)
+from aws_cdk import Stack
 
 from aws_cdk.pipelines import (
-    CodeBuildOptions,
     CodePipeline,
     CodePipelineSource,
     ShellStep
@@ -38,19 +34,7 @@ class CdkbootStack(Stack):
                     'cdk synth'
                 ]
             ),
-            docker_enabled_for_synth = True,
-            synth_code_build_defaults = CodeBuildOptions(
-                role_policy = [
-                    _iam.PolicyStatement(
-                        actions = [
-                            'organizations:DescribeOrganization'
-                        ],
-                        resources = [
-                            '*'
-                        ]
-                    )
-                ]
-            )
+            docker_enabled_for_synth = True
         )
 
         pipeline.add_stage(
