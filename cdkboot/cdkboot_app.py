@@ -1,3 +1,6 @@
+import boto3
+import sys
+
 from aws_cdk import (
     Duration,
     RemovalPolicy,
@@ -31,12 +34,15 @@ class CdkbootApp(Stack):
         region = Stack.of(self).region
         bucket_name = 'cdkboot-bootstrap-'+account+'-'+region
 
-### Organization ID Parameter ###
+### Organization ID ###
 
-        orgid = _ssm.StringParameter.from_string_parameter_attributes(
-            self, 'orgid',
-            parameter_name = '/cdkboot/orgid'
-        ).string_value
+        try:
+            org_client = boto3.client('organizations')
+            organization = org_client.describe_organization()
+        except:
+            print('Missing IAM Permission --> organizations:DescribeOrganization')
+            sys.exit(1)
+            pass
 
 ### Bootstrap Bucket ###
 
@@ -63,7 +69,7 @@ class CdkbootApp(Stack):
             resources = [
                 bucket.bucket_arn+'/*'
             ],
-            conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
+            conditions = {"StringEquals": {"aws:PrincipalOrgID": organization['Organization']['Id']}}
         )
         bucket.add_to_resource_policy(bucket_policy)
 
