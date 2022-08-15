@@ -63,7 +63,7 @@ class CdkbootApp(Stack):
             resources = [
                 bucket.bucket_arn+'/*'
             ],
-            conditions = {"StringEquals": {"aws:PrincipalOrgID": organization['Organization']['Id']}}
+            conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
         )
         bucket.add_to_resource_policy(bucket_policy)
 
