@@ -18,6 +18,7 @@ CdkbootStack(
     )
 )
 
-cdk.Tags.of(app).add('cdkboot', 'cdkboot')
+cdk.Tags.of(app).add('Alias','Pipeline')
+cdk.Tags.of(app).add('GitHub','https://github.com/jblukach/cdkboot.git')
 
 app.synth()
