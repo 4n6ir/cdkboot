@@ -260,5 +260,5 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD,
         )
 
-        notify = _notifications.LambdaDestination(deploy)
-        bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
+        #notify = _notifications.LambdaDestination(deploy)
+        #bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
