@@ -82,7 +82,26 @@ class CdkbootApp(Stack):
             ],
             conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
         )
+
         bucket.add_to_resource_policy(bucket_policy)
+
+        bucket_policy_cfn = _iam.PolicyStatement(
+            effect = _iam.Effect(
+                'ALLOW'
+            ),
+            principals = [
+                _iam.ServicePrincipal('cloudformation.amazonaws.com')
+            ],
+            actions = [
+                's3:GetObject'  
+            ],
+            resources = [
+                bucket.bucket_arn+'/*'
+            ],
+            conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
+        )
+
+        bucket.add_to_resource_policy(bucket_policy_cfn)
 
 ### IAM Role ###
 
