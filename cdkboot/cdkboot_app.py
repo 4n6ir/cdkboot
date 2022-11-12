@@ -72,24 +72,7 @@ class CdkbootApp(Stack):
                 'ALLOW'
             ),
             principals = [
-                _iam.AnyPrincipal()
-            ],
-            actions = [
-                's3:GetObject'  
-            ],
-            resources = [
-                bucket.bucket_arn+'/*'
-            ],
-            conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
-        )
-
-        bucket.add_to_resource_policy(bucket_policy)
-
-        bucket_policy_cfn = _iam.PolicyStatement(
-            effect = _iam.Effect(
-                'ALLOW'
-            ),
-            principals = [
+                _iam.AnyPrincipal(),
                 _iam.ServicePrincipal('cloudformation.amazonaws.com')
             ],
             actions = [
@@ -101,7 +84,7 @@ class CdkbootApp(Stack):
             conditions = {"StringEquals": {"aws:PrincipalOrgID": orgid}}
         )
 
-        bucket.add_to_resource_policy(bucket_policy_cfn)
+        bucket.add_to_resource_policy(bucket_policy)
 
 ### IAM Role ###
 
@@ -281,3 +264,5 @@ class CdkbootApp(Stack):
 
         #notify = _notifications.LambdaDestination(deploy)
         #bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
+
+
