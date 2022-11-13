@@ -23,8 +23,6 @@ class CdkbootApp(Stack):
 
         qualifier = '4n6ir'                         # <-- Enter CDK Qualifier
 
-        regions = 'us-east-1,us-east-2,us-west-2'   # <-- Enter Regions
-
 ################################################################################
 
         account = Stack.of(self).account
@@ -104,15 +102,13 @@ class CdkbootApp(Stack):
         role.add_to_policy(
             _iam.PolicyStatement(
                 actions = [
-                    'cloudformation:UpdateStack',
+                    'cloudformation:UpdateStackSet',
                     'iam:PassRole',
-                    'organizations:ListAccounts',
                     's3:GetObject',
                     's3:PutObject',
                     'secretsmanager:GetSecretValue',
                     'ssm:GetParameter',
-                    'ssm:PutParameter',
-                    'sts:AssumeRole'
+                    'ssm:PutParameter'
                 ],
                 resources = ['*']
             )
@@ -236,8 +232,7 @@ class CdkbootApp(Stack):
                 ACCOUNT = account,
                 BUCKET = bucket.bucket_name,
                 QUALIFIER = qualifier,
-                REGION = region,
-                REGIONS = regions
+                REGION = region
             ),
             timeout = Duration.seconds(900),
             memory_size = 512,
@@ -262,7 +257,5 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD,
         )
 
-        #notify = _notifications.LambdaDestination(deploy)
-        #bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
-
-
+        notify = _notifications.LambdaDestination(deploy)
+        bucket.add_event_notification(_s3.EventType.OBJECT_CREATED, notify)
