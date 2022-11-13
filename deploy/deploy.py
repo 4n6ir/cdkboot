@@ -25,30 +25,29 @@ def handler(event, context):
                     StackSetName = summary['StackSetName'],
                     TemplateURL = 'https://'+os.environ['BUCKET']+'.s3.'+os.environ['REGION']+'.amazonaws.com/cdk.yaml',
                     Capabilities = ['CAPABILITY_NAMED_IAM'],
-                    #ExecutionRoleName = output['StackSet']['ExecutionRoleName'],
-                    CallAs = 'DELEGATED_ADMIN'
-                    #Parameters = [
-                    #    {
-                    #        'ParameterKey': 'CloudFormationExecutionPolicies',
-                    #        'ParameterValue': 'arn:aws:iam::aws:policy/AdministratorAccess'
-                    #    },
-                    #    {
-                    #        'ParameterKey': 'FileAssetsBucketKmsKeyId',
-                    #        'ParameterValue': 'AWS_MANAGED_KEY'
-                    #    },
-                    #    {
-                    #        'ParameterKey': 'PublicAccessBlockConfiguration',
-                    #        'ParameterValue': 'true'
-                    #    },
-                    #    {
-                    #        'ParameterKey': 'Qualifier',
-                    #        'ParameterValue': os.environ['QUALIFIER']
-                    #    },
-                    #    {
-                    #        'ParameterKey': 'TrustedAccounts',
-                    #        'ParameterValue': os.environ['ACCOUNT']
-                    #    }
-                    #]
+                    CallAs = 'DELEGATED_ADMIN',
+                    Parameters = [
+                        {
+                            'ParameterKey': 'CloudFormationExecutionPolicies',
+                            'ParameterValue': 'arn:aws:iam::aws:policy/AdministratorAccess'
+                        },
+                        {
+                            'ParameterKey': 'FileAssetsBucketKmsKeyId',
+                            'ParameterValue': 'AWS_MANAGED_KEY'
+                        },
+                        {
+                            'ParameterKey': 'PublicAccessBlockConfiguration',
+                            'ParameterValue': 'true'
+                        },
+                        {
+                            'ParameterKey': 'Qualifier',
+                            'ParameterValue': os.environ['QUALIFIER']
+                        },
+                        {
+                            'ParameterKey': 'TrustedAccounts',
+                            'ParameterValue': os.environ['ACCOUNT']
+                        }
+                    ]
                 )
                 print(status)
 
