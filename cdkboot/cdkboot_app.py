@@ -102,6 +102,7 @@ class CdkbootApp(Stack):
         role.add_to_policy(
             _iam.PolicyStatement(
                 actions = [
+                    'cloudformation:ListStackSets',
                     'cloudformation:UpdateStackSet',
                     'iam:PassRole',
                     's3:GetObject',
