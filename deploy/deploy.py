@@ -17,11 +17,15 @@ def handler(event, context):
         for summary in page['Summaries']:
             if summary['StackSetName'].startswith('cdk-bootstrap-4n6ir-us-east-1'):
                 print(summary)
+                output = cfn_client.describe_stack_set(
+                    StackSetName = summary['StackSetName'],
+                    CallAs = 'DELEGATED_ADMIN'
+                )
                 status = cfn_client.update_stack_set(
                     StackName = summary['StackSetName'],
                     TemplateURL = 'https://'+os.environ['BUCKET']+'.s3.'+os.environ['REGION']+'.amazonaws.com/cdk.yaml',
                     Capabilities = ['CAPABILITY_NAMED_IAM'],
-                    AdministrationRoleARN = summary['StackSet']['AdministrationRoleARN'],
+                    AdministrationRoleARN = output['StackSet']['AdministrationRoleARN'],
                     Parameters = [
                         {
                             'ParameterKey': 'CloudFormationExecutionPolicies',
