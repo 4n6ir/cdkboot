@@ -26,6 +26,7 @@ def handler(event, context):
                     TemplateURL = 'https://'+os.environ['BUCKET']+'.s3.'+os.environ['REGION']+'.amazonaws.com/cdk.yaml',
                     Capabilities = ['CAPABILITY_NAMED_IAM'],
                     ExecutionRoleName = output['StackSet']['ExecutionRoleName'],
+                    CallAs = 'DELEGATED_ADMIN',
                     Parameters = [
                         {
                             'ParameterKey': 'CloudFormationExecutionPolicies',
