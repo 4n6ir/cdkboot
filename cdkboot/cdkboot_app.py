@@ -70,8 +70,7 @@ class CdkbootApp(Stack):
                 'ALLOW'
             ),
             principals = [
-                _iam.AnyPrincipal(),
-                _iam.ServicePrincipal('cloudformation.amazonaws.com')
+                _iam.AnyPrincipal()
             ],
             actions = [
                 's3:GetObject'  
@@ -105,6 +104,8 @@ class CdkbootApp(Stack):
                     'cloudformation:ListStackSets',
                     'cloudformation:UpdateStackSet',
                     'iam:PassRole',
+                    'organizations:ListDelegatedAdministrators',
+                    'organizations:ListDelegatedServicesForAccount',
                     's3:GetObject',
                     's3:PutObject',
                     'secretsmanager:GetSecretValue',
