@@ -22,7 +22,7 @@ def handler(event, context):
                     CallAs = 'DELEGATED_ADMIN'
                 )
                 status = cfn_client.update_stack_set(
-                    StackName = summary['StackSetName'],
+                    StackSetName = summary['StackSetName'],
                     TemplateURL = 'https://'+os.environ['BUCKET']+'.s3.'+os.environ['REGION']+'.amazonaws.com/cdk.yaml',
                     Capabilities = ['CAPABILITY_NAMED_IAM'],
                     AdministrationRoleARN = output['StackSet']['AdministrationRoleARN'],
