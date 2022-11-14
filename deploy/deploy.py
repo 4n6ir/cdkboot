@@ -15,8 +15,8 @@ def handler(event, context):
 
     for page in pages:
         for summary in page['Summaries']:
-            if summary['StackSetName'].startswith('cdk-bootstrap-4n6ir-us-east-1'):
-                print(summary)
+            if summary['StackSetName'].startswith('cdk-bootstrap-'+os.environ['QUALIFIER']+'-'):
+                print(summary['StackSetName'])
                 output = cfn_client.describe_stack_set(
                     StackSetName = summary['StackSetName'],
                     CallAs = 'DELEGATED_ADMIN'
@@ -49,7 +49,6 @@ def handler(event, context):
                         }
                     ]
                 )
-                print(status)
 
     return {
         'statusCode': 200,
