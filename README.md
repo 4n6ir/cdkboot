@@ -2,20 +2,27 @@
 
 CDKBOOT keeps the bootstrap version current with the latest release to support continuous deployments!
 
-Accounts must be bootstrapped by CDK as the established deploy and execute role permissions update the current stack. 
+The GitHub repository RSS feed gets monitored for CDK v2 releases.
 
-I use AQUEDUCT, a CDK command line interface script, to get started quickly for organizations using single sign-on configurations.
+https://github.com/aws/aws-cdk/releases.atom
 
- - https://github.com/4n6ir/aqueduct
+The latest Cloud Development Kit (CDK) release generates and uploads the Cloud Formation bootstrap to an S3 bucket.
 
-The GitHub repository RSS feed gets monitored for CDK v2 releases. 
+```
+export CDK_NEW_BOOTSTRAP=1 && cdk bootstrap --show-template > /tmp/cdk.yaml
+```
 
- - https://github.com/aws/aws-cdk/releases.atom
+CDK bootstrap is manually deployed using Organization StackSets from a delegated administrator account with names beginning with ```cdk-bootstrap-4n6ir-``` where ```4n6ir``` changes for the specific qualifier.
 
-The Cloud Formation gets pushed out to all accounts and configured regions.
+This provides a method to identify which stacks need updates when the bootstrap changes.
 
- - https://github.com/jblukach/cdkboot/blob/main/cdkboot/cdkboot_stack.py#L22
+https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-contract
 
-Additional information for changes to the CDK bootstrap is available to read.
+Organization StackSets are unavailable in the **management (root) account** or newly launched regions.
 
- - https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-contract
+- ap-south-2
+- eu-central-2
+- eu-south-2
+- me-central-1
+
+The bootstrap template created by CDKBOOT can deploy a regular Cloud Formation Stack if necessary for these locations with the existing S3 permissions.
