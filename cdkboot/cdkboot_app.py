@@ -140,7 +140,7 @@ class CdkbootApp(Stack):
                 BOOTSTRAP = bootstrap.parameter_name
             ),
             timeout = Duration.seconds(900),
-            memory_size = 512,
+            memory_size = 1024,
             role = role
         )
 
