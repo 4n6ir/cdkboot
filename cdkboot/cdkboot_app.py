@@ -40,7 +40,7 @@ class CdkbootApp(Stack):
 
         layer = _lambda.LayerVersion.from_layer_version_arn(
             self, 'layer',
-            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:3'
+            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:5'
         )
 
 ### Bootstrap Bucket ###
@@ -218,7 +218,7 @@ class CdkbootApp(Stack):
 
         deploy = _lambda.Function(
             self, 'deploy',
-            runtime = _lambda.Runtime.PYTHON_3_9,
+            runtime = _lambda.Runtime.PYTHON_3_10,
             code = _lambda.Code.from_asset('deploy'),
             handler = 'deploy.handler',
             architecture = _lambda.Architecture.ARM_64,
