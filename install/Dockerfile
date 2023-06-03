@@ -9,3 +9,4 @@ RUN yum clean all
 COPY install.py requirements.txt ./
 RUN pip --no-cache-dir install -r requirements.txt --upgrade
 CMD ["install.handler"]
+
