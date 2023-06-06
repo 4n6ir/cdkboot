@@ -36,11 +36,18 @@ class CdkbootApp(Stack):
             parameter_name = '/cdkboot/orgid'
         ).string_value
 
+### Account IDs Parameter ###
+
+        acctids = _ssm.StringParameter.from_string_parameter_attributes(
+            self, 'acctids',
+            parameter_name = '/cdkboot/acctids'
+        ).string_value
+
 ### LAMBDA LAYER ###
 
         layer = _lambda.LayerVersion.from_layer_version_arn(
             self, 'layer',
-            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:5'
+            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:7'
         )
 
 ### Bootstrap Bucket ###
@@ -223,7 +230,7 @@ class CdkbootApp(Stack):
             handler = 'deploy.handler',
             architecture = _lambda.Architecture.ARM_64,
             environment = dict(
-                ACCOUNT = account,
+                ACCOUNT = acctids,
                 BUCKET = bucket.bucket_name,
                 QUALIFIER = qualifier,
                 REGION = region

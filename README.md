@@ -20,9 +20,4 @@ https://docs.aws.amazon.com/cdk/latest/guide/bootstrapping.html#bootstrapping-co
 
 Organization StackSets are unavailable in the **management (root) account** or newly launched regions.
 
-- ap-south-2
-- eu-central-2
-- eu-south-2
-- me-central-1
-
 The bootstrap template created by CDKBOOT can deploy a regular Cloud Formation Stack if necessary for these locations with the existing S3 permissions.
