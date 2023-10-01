@@ -47,7 +47,7 @@ class CdkbootApp(Stack):
 
         layer = _lambda.LayerVersion.from_layer_version_arn(
             self, 'layer',
-            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:7'
+            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:9'
         )
 
 ### Bootstrap Bucket ###
@@ -134,6 +134,7 @@ class CdkbootApp(Stack):
                 }
             ),
             environment = dict(
+                AWS_ACCOUNT = account,
                 BUCKET = bucket.bucket_name,
                 BOOTSTRAP = bootstrap.parameter_name
             ),
@@ -145,7 +146,7 @@ class CdkbootApp(Stack):
         installlogs = _logs.LogGroup(
             self, 'installlogs',
             log_group_name = '/aws/lambda/'+install.function_name,
-            retention = _logs.RetentionDays.ONE_DAY,
+            retention = _logs.RetentionDays.ONE_MONTH,
             removal_policy = RemovalPolicy.DESTROY
         )
 
@@ -185,6 +186,7 @@ class CdkbootApp(Stack):
             self, 'version',
             code = _lambda.DockerImageCode.from_image_asset('version'),
             environment = dict(
+                AWS_ACCOUNT = account,
                 VERSIONS = versions.parameter_name
             ),
             timeout = Duration.seconds(900),
@@ -195,7 +197,7 @@ class CdkbootApp(Stack):
         versionlogs = _logs.LogGroup(
             self, 'versionlogs',
             log_group_name = '/aws/lambda/'+version.function_name,
-            retention = _logs.RetentionDays.ONE_DAY,
+            retention = _logs.RetentionDays.ONE_MONTH,
             removal_policy = RemovalPolicy.DESTROY
         )
 
@@ -225,11 +227,12 @@ class CdkbootApp(Stack):
 
         deploy = _lambda.Function(
             self, 'deploy',
-            runtime = _lambda.Runtime.PYTHON_3_10,
+            runtime = _lambda.Runtime.PYTHON_3_11,
             code = _lambda.Code.from_asset('deploy'),
             handler = 'deploy.handler',
             architecture = _lambda.Architecture.ARM_64,
             environment = dict(
+                AWS_ACCOUNT = account,
                 ACCOUNT = acctids,
                 BUCKET = bucket.bucket_name,
                 QUALIFIER = qualifier,
@@ -246,7 +249,7 @@ class CdkbootApp(Stack):
         deploylogs = _logs.LogGroup(
             self, 'deploylogs',
             log_group_name = '/aws/lambda/'+deploy.function_name,
-            retention = _logs.RetentionDays.ONE_DAY,
+            retention = _logs.RetentionDays.ONE_MONTH,
             removal_policy = RemovalPolicy.DESTROY
         )
 

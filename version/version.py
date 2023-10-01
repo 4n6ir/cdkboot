@@ -25,6 +25,7 @@ def handler(event, context):
 
             f = open('/tmp/Dockerfile', 'w')
             f.write('# CDK '+poll_response.entries[0].title+'\n')
+            f.write('FROM public.ecr.aws/forensicir/getpublicip:latest AS layer\n')
             f.write('FROM public.ecr.aws/lambda/python:latest\n')
             f.write('RUN yum -y update\n')
             f.write('RUN curl -sL https://rpm.nodesource.com/setup_16.x | bash -\n')
@@ -32,9 +33,14 @@ def handler(event, context):
             f.write('RUN yum install -y nodejs\n')
             f.write('RUN npm install -g aws-cdk@latest\n')
             f.write('RUN yum clean all\n')
-            f.write('COPY install.py requirements.txt ./\n')
+            f.write('### layer code ###\n')
+            f.write('WORKDIR /opt\n')
+            f.write('COPY --from=layer /opt/ .\n')
+            f.write('### function code ###\n')
+            f.write('WORKDIR /var/task\n')
+            f.write('COPY install.py requirements.txt .\n')
             f.write('RUN pip --no-cache-dir install -r requirements.txt --upgrade\n')
-            f.write('CMD ["install.handler"]\n')
+            f.write('CMD ["install.handler"]')
             f.close()
 
             with open('/tmp/Dockerfile', 'r') as f:
