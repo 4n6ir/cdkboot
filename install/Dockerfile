@@ -2,9 +2,8 @@
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
 FROM public.ecr.aws/lambda/python:latest
 RUN yum -y update
-RUN yum install binutils gcc gcc-c++ glibc make -y
 RUN yum install https://rpm.nodesource.com/pub_20.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
-RUN yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+RUN yum install nsolid -y
 RUN npm install -g aws-cdk@latest
 RUN yum clean all
 ### layer code ###
