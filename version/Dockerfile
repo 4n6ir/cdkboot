@@ -6,6 +6,6 @@ WORKDIR /opt
 COPY --from=layer /opt/ .
 ### function code ###
 WORKDIR /var/task
-COPY version.py requirements.txt .
+COPY version.py requirements.txt /var/task/ .
 RUN pip --no-cache-dir install -r requirements.txt --upgrade
 CMD ["version.handler"]
