@@ -28,7 +28,7 @@ def handler(event, context):
             f.write('FROM public.ecr.aws/forensicir/getpublicip:latest AS layer\n')
             f.write('FROM public.ecr.aws/lambda/python:latest\n')
             f.write('RUN yum -y update\n')
-            f.write('RUN yum install glibc -y\n')
+            f.write('RUN yum install gcc-c++ make -y\n')
             f.write('RUN yum install https://rpm.nodesource.com/pub_20.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y\n')
             f.write('RUN yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1\n')
             f.write('RUN npm install -g aws-cdk@latest\n')
