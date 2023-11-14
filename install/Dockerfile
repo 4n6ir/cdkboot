@@ -1,4 +1,4 @@
-# CDK v2.107.0
+# CDK v2.108.0
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
 FROM public.ecr.aws/lambda/python:latest
 RUN yum -y update
