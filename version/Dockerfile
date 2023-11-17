@@ -1,4 +1,4 @@
-### 2.99.1 (build b2a895e) ###
+### 2.110.0 (build c6471f2) ###
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
 FROM public.ecr.aws/lambda/python:latest
 RUN yum -y update && yum clean all
