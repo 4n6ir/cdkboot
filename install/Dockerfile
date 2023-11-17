@@ -1,4 +1,4 @@
-# CDK v2.110.0
+# CDK v2.110.0 
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
 FROM public.ecr.aws/lambda/provided:al2023
 RUN dnf -y update
