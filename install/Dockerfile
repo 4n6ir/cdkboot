@@ -1,6 +1,6 @@
 # CDK v2.110.0
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
-FROM public.ecr.aws/provided.al2023
+FROM public.ecr.aws/lambda/provided:al2023
 RUN dnf -y update
 RUN dnf install -y python3
 RUN dnf module list nodejs
