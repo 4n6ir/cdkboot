@@ -3,7 +3,7 @@ FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
 FROM public.ecr.aws/lambda/provided:al2023
 RUN dnf -y update
 RUN dnf install -y python3
-RUN dnf module install nodejs -y
+RUN dnf install -y nodejs
 RUN npm install -g aws-cdk@latest
 RUN dnf clean all
 ### layer code ###
