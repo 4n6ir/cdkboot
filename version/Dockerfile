@@ -1,7 +1,9 @@
 ### 2.110.0 (build c6471f2) ###
 FROM public.ecr.aws/forensicir/getpublicip:latest AS layer
-FROM public.ecr.aws/lambda/python:latest
-RUN yum -y update && yum clean all
+FROM public.ecr.aws/lambda/provided:al2023
+RUN dnf -y update
+RUN dnf install -y python3
+RUN dnf clean all
 ### layer code ###
 WORKDIR /opt
 COPY --from=layer /opt/ .
