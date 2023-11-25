@@ -45,9 +45,19 @@ class CdkbootApp(Stack):
 
 ### LAMBDA LAYER ###
 
+        feedparser = _lambda.LayerVersion.from_layer_version_arn(
+            self, 'feedparser',
+            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:feedparser:1'
+        )
+
         getpublicip = _lambda.LayerVersion.from_layer_version_arn(
             self, 'getpublicip',
             layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:9'
+        )
+
+        pygithub = _lambda.LayerVersion.from_layer_version_arn(
+            self, 'pygithub',
+            layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:pygithub:1'
         )
 
 ### Bootstrap Bucket ###
@@ -185,32 +195,40 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD
         )
 
-        #version = _lambda.DockerImageFunction(
-        #    self, 'version',
-        #    code = _lambda.DockerImageCode.from_image_asset('version'),
-        #    environment = dict(
-        #        AWS_ACCOUNT = account,
-        #        VERSIONS = versions.parameter_name
-        #    ),
-        #    timeout = Duration.seconds(900),
-        #    memory_size = 512,
-        #    role = role
-        #)
+        version = _lambda.Function(
+            self, 'version',
+            runtime = _lambda.Runtime.PYTHON_3_11,
+            code = _lambda.Code.from_asset('version'),
+            handler = 'version.handler',
+            architecture = _lambda.Architecture.ARM_64,
+            environment = dict(
+                AWS_ACCOUNT = account,
+                VERSIONS = versions.parameter_name
+            ),
+            timeout = Duration.seconds(900),
+            memory_size = 512,
+            role = role,
+            layers = [
+                feedparser,
+                getpublicip,
+                pygithub
+            ]
+        )
 
-        #versionlogs = _logs.LogGroup(
-        #    self, 'versionlogs',
-        #    log_group_name = '/aws/lambda/'+version.function_name,
-        #    retention = _logs.RetentionDays.ONE_MONTH,
-        #    removal_policy = RemovalPolicy.DESTROY
-        #)
+        versionlogs = _logs.LogGroup(
+            self, 'versionlogs',
+            log_group_name = '/aws/lambda/'+version.function_name,
+            retention = _logs.RetentionDays.ONE_MONTH,
+            removal_policy = RemovalPolicy.DESTROY
+        )
 
-        #versionmonitor = _ssm.StringParameter(
-        #    self, 'versionmonitor',
-        #    description = 'CDKBoot Version Monitor',
-        #    parameter_name = '/cdkboot/monitor/version',
-        #    string_value = '/aws/lambda/'+version.function_name,
-        #    tier = _ssm.ParameterTier.STANDARD,
-        #)
+        versionmonitor = _ssm.StringParameter(
+            self, 'versionmonitor',
+            description = 'CDKBoot Version Monitor',
+            parameter_name = '/cdkboot/monitor/version',
+            string_value = '/aws/lambda/'+version.function_name,
+            tier = _ssm.ParameterTier.STANDARD,
+        )
 
         event = _events.Rule(
             self, 'event',
@@ -223,11 +241,11 @@ class CdkbootApp(Stack):
             )
         )
 
-        #event.add_target(
-        #    _targets.LambdaFunction(
-        #       version
-        #   )
-        #)
+        event.add_target(
+            _targets.LambdaFunction(
+               version
+           )
+        )
 
 ### Deploy Cloud Formation ###
 

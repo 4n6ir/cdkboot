@@ -10,8 +10,7 @@ RUN dnf clean all
 WORKDIR /opt
 COPY --from=layer /opt/ .
 ### function code ###
-WORKDIR /var/task
-COPY install.py /var/task/install.py
-COPY requirements.txt /var/task/requirements.txt
+WORKDIR /app
+COPY install.py requirements.txt ./
 RUN pip --no-cache-dir install -r requirements.txt --upgrade
 CMD ["install.handler"]
