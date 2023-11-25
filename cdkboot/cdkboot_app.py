@@ -45,8 +45,8 @@ class CdkbootApp(Stack):
 
 ### LAMBDA LAYER ###
 
-        layer = _lambda.LayerVersion.from_layer_version_arn(
-            self, 'layer',
+        getpublicip = _lambda.LayerVersion.from_layer_version_arn(
+            self, 'getpublicip',
             layer_version_arn = 'arn:aws:lambda:'+region+':070176467818:layer:getpublicip:9'
         )
 
@@ -168,8 +168,11 @@ class CdkbootApp(Stack):
                 year = '*'
             )
         )
+
         events.add_target(
-            _targets.LambdaFunction(install)
+            _targets.LambdaFunction(
+                install
+            )
         )
 
 ### GitHub RSS Feed ###
@@ -182,32 +185,32 @@ class CdkbootApp(Stack):
             tier = _ssm.ParameterTier.STANDARD
         )
 
-        version = _lambda.DockerImageFunction(
-            self, 'version',
-            code = _lambda.DockerImageCode.from_image_asset('version'),
-            environment = dict(
-                AWS_ACCOUNT = account,
-                VERSIONS = versions.parameter_name
-            ),
-            timeout = Duration.seconds(900),
-            memory_size = 512,
-            role = role
-        )
+        #version = _lambda.DockerImageFunction(
+        #    self, 'version',
+        #    code = _lambda.DockerImageCode.from_image_asset('version'),
+        #    environment = dict(
+        #        AWS_ACCOUNT = account,
+        #        VERSIONS = versions.parameter_name
+        #    ),
+        #    timeout = Duration.seconds(900),
+        #    memory_size = 512,
+        #    role = role
+        #)
 
-        versionlogs = _logs.LogGroup(
-            self, 'versionlogs',
-            log_group_name = '/aws/lambda/'+version.function_name,
-            retention = _logs.RetentionDays.ONE_MONTH,
-            removal_policy = RemovalPolicy.DESTROY
-        )
+        #versionlogs = _logs.LogGroup(
+        #    self, 'versionlogs',
+        #    log_group_name = '/aws/lambda/'+version.function_name,
+        #    retention = _logs.RetentionDays.ONE_MONTH,
+        #    removal_policy = RemovalPolicy.DESTROY
+        #)
 
-        versionmonitor = _ssm.StringParameter(
-            self, 'versionmonitor',
-            description = 'CDKBoot Version Monitor',
-            parameter_name = '/cdkboot/monitor/version',
-            string_value = '/aws/lambda/'+version.function_name,
-            tier = _ssm.ParameterTier.STANDARD,
-        )
+        #versionmonitor = _ssm.StringParameter(
+        #    self, 'versionmonitor',
+        #    description = 'CDKBoot Version Monitor',
+        #    parameter_name = '/cdkboot/monitor/version',
+        #    string_value = '/aws/lambda/'+version.function_name,
+        #    tier = _ssm.ParameterTier.STANDARD,
+        #)
 
         event = _events.Rule(
             self, 'event',
@@ -219,9 +222,12 @@ class CdkbootApp(Stack):
                 year = '*'
             )
         )
-        event.add_target(
-            _targets.LambdaFunction(version)
-        )
+
+        #event.add_target(
+        #    _targets.LambdaFunction(
+        #       version
+        #   )
+        #)
 
 ### Deploy Cloud Formation ###
 
@@ -242,7 +248,7 @@ class CdkbootApp(Stack):
             memory_size = 512,
             role = role,
             layers = [
-                layer
+                getpublicip
             ]
         )
 
